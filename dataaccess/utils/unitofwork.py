@@ -8,8 +8,6 @@ from dataaccess.repositories import abstract_repos
 class IUnitOfWork(ABC):
     users = abstract_repos.IRepository
     user_attempts = abstract_repos.IUserAttemptRepository
-    fsm_data = abstract_repos.IRepository
-    fsm_state = abstract_repos.IRepository
     lessons = abstract_repos.ILessonRepository
     questions = abstract_repos.IQuestionRepository
     answers = abstract_repos.IRepository
@@ -59,8 +57,6 @@ class SqlAlchemyUnitOfWork(IUnitOfWork):
 
         self.users = sqlalchlemy_repos.UserRepo(self.session)
         self.user_attempts = sqlalchlemy_repos.UserAttemptRepo(self.session)
-        self.fsm_data = sqlalchlemy_repos.fsm_data.FSMDataRepo(self.session)
-        self.fsm_state = sqlalchlemy_repos.fsm_data.FSMStateRepo(self.session)
         self.lessons = sqlalchlemy_repos.LessonRepo(self.session)
         self.questions = sqlalchlemy_repos.QuestionRepo(self.session)
         self.answers = sqlalchlemy_repos.AnswerRepo(self.session)
