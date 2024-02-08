@@ -1,12 +1,10 @@
 import pytest
 from httpx import AsyncClient
-from fastapi.testclient import TestClient
 
-from app.main import app as fastapi_app
-from config import settings
-from dataaccess.database import Base, engine
-from dataaccess.models import *
-from dataaccess.utils.unitofwork import SqlAlchemyUnitOfWork
+from app import app as fastapi_app
+from app.config import settings
+from data_access import Base, engine
+from app.utils import SqlAlchemyUnitOfWork
 
 
 @pytest.fixture(scope="session", autouse=True)

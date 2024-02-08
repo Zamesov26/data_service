@@ -7,6 +7,6 @@ class AnswerResponse(BaseModel):
     is_true: bool
 
 
-class CreateAnswer(BaseModel):
+class Answer(BaseModel):
     text: str
     is_true: bool

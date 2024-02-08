@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Create question</h1>
+<form method="post" action="/course/{{ course_id }}/lesson/{{ lesson_id }}/create_question/">
+    <label for="question">Question:</label>
+    <br>
+    <textarea id="question" name="question" rows="4" cols="50" required></textarea>
+    <br>
+    <fieldset>
+        <legend>Question type:</legend>
+        <label>
+            <input type="radio" name="question_type" value="single" checked>
+            single
+        </label>
+        <label>
+            <input type="radio" name="question_type" value="multiple">
+            multiple
+        </label>
+        <label>
+            <input type="radio" name="question_type" value="open-ended">
+            open-ended
+        </label>
+    </fieldset>
+
+    <div id="questionsContainer">
+        <!-- Initial question -->
+    </div>
+
+    <button type="button" onclick="addQuestion()">Add Question</button>
+    <br>
+
+    <button type="button" onclick="submitForm()">Submit</button>
+</form>
+
+<script>
+        let questionCounter = 0;
+
+        function removeQuestion(button) {
+            const questionDiv = button.closest('.answer');
+            questionDiv.remove();
+        }
+
+        function addQuestion() {
+            questionCounter++;
+
+            const questionsContainer = document.getElementById('questionsContainer');
+
+            // Create a new question div
+            const newQuestionDiv = document.createElement('div');
+            newQuestionDiv.classList.add('answer');
+
+            // Create elements for the new question
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.classList.add('answer__flag');
+            checkbox.name = 'is_true';
+            checkbox.value = `Answer${questionCounter}`;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.classList.add('answer__text');
+            input.name = 'text';
+            input.placeholder = 'Additional Input';
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.textContent = 'Remove';
+            removeButton.addEventListener('click', function() {
+                removeQuestion(this);
+            });
+
+            // Append elements to the new question div
+            newQuestionDiv.appendChild(checkbox);
+            newQuestionDiv.appendChild(input);
+            newQuestionDiv.appendChild(removeButton);
+
+            // Append the new question div to the questions container
+            questionsContainer.appendChild(newQuestionDiv);
+        }
+        addQuestion();
+        addQuestion();
+        addQuestion();
+
+
+        function submitForm() {
+            var question = document.getElementById('question').value;;
+
+            var radioButtons = document.getElementsByName("question_type");
+
+            var type;
+            for (var i = 0; i < radioButtons.length; i++) {
+                if (radioButtons[i].checked) {
+                    type = radioButtons[i].value;
+                    break;
+                }
+            }
+
+            var formData = {
+                text: question,
+                type: type,
+                answers: [],
+            };
+
+            var answers = document.getElementsByClassName("answer")
+             for (var i = 0; i < answers.length; i++) {
+                var currentAnswer = answers[i];
+                var text = currentAnswer.querySelector(".answer__text").value;
+                var flag = currentAnswer.querySelector(".answer__flag").checked;
+                formData.answers.push({text: text, is_true: flag});
+             }
+
+            fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Request failed with status:', response.status);
+                } else {
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+</script>
+
+</body>
+</html>

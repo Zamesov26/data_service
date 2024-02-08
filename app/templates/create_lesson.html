@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Create lesson</h1>
+<form method="post" action="/course/{{ course_id }}/new_lesson">
+    <label for="lesson_name">Lesson name</label>
+    <br>
+    <textarea id="lesson_name" name="lesson_name" rows="4" cols="50" required></textarea>
+    <br>
+    <label for="description">description</label>
+    <br>
+    <textarea id="description" name="description" rows="4" cols="50" required></textarea>
+    <button type="submit">Создать</button>
+</form>
+</body>
+</html>

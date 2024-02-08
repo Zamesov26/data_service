@@ -1,30 +1,36 @@
-from fastapi import APIRouter, Depends
+from typing import Union
 
-from app.database import get_uow
-from app.models.users import UserResponse, UserCreate, UserDelete
-from dataaccess.services import UserService
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
+from starlette.responses import JSONResponse
+
+from app.utils.uow import get_uow
+from app.services import UserService
 
 router = APIRouter()
 
 
-@router.get('/users', response_model=list[UserResponse])
-async def get_users(uow=Depends(get_uow)):
-    users = await UserService.get_all(uow)
-    return users
+class NewUserAPI(BaseModel):
+    telegram_id: int
+    user_name: Union[str, None] = None
 
 
-@router.post('/user/add', status_code=201, response_model=UserResponse)
-async def add_user(user=Depends(UserCreate), uow=Depends(get_uow)):
-    user = await UserService.create(uow, user.id, user.name)
-    return user
+@router.post('/new_user')
+async def new_user(user_info: NewUserAPI, uow=Depends(get_uow)):
+    user = await UserService().get_by_tg_id(uow,
+                                            str(user_info.telegram_id))
+    if user:
+        return JSONResponse(status_code=409,
+                            content={
+                                'status': 'Conflict',
+                                'message': 'The user already exists'
+                            })
 
-
-@router.post('/user/del', status_code=204)
-async def del_user(user=Depends(UserDelete), uow=Depends(get_uow)):
-    await UserService.delete(uow, user.id)
-
-
-@router.post('/user/del_many', status_code=204)
-async def del_many(users: list[UserDelete], uow=Depends(get_uow)):
-    user_ids = [user.id for user in users]
-    await UserService.delete_all(uow, user_ids)
+    user = await UserService().create(uow,
+                                      tg_id=str(user_info.telegram_id),
+                                      user_name=user_info.user_name)
+    return JSONResponse(status_code=201,
+                        content={
+                            'status': 'Created',
+                            'message': 'User has been created'
+                        })

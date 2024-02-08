@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
-from app.models.answers import AnswerResponse, CreateAnswer
+from app.schemas.answers import AnswerResponse, Answer
 
 
 class QuestionResponse(BaseModel):
@@ -14,17 +14,13 @@ class QuestionResponse(BaseModel):
 
 
 class CreateQuestion(BaseModel):
-    id: int
     type: str
     text: str
-
-    def to_dict(self):
-        res = self.__dict__
-        return res
+    answers: List[Answer]
 
 
 class CreateQuestionWithAnswers(CreateQuestion):
-    answers: list[CreateAnswer]
+    answers: list[Answer]
 
     def to_dict(self):
         res = super().to_dict()
